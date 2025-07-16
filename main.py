@@ -1,3 +1,4 @@
+from typing import Any
 import requests, aiohttp, json, asyncio
 
 def testc(n):
@@ -20,9 +21,9 @@ def testc(n):
 #        mov['synopsis'].strip()
 #    ))
 
-async def root_movie_fetch(outputfile: str|None = None):
+async def root_movie_fetch(outputfile: str|None = None)-> list[Any]:
     async with aiohttp.ClientSession() as ses:
-        async def mfetch(n, sess):
+        async def mfetch(n, sess)-> list[Any]:
             async with sess.get(f"https://95tv.live/api/client/v1/content/display/movie/items?page={n}&length=10", headers={'platform': 'android', 'version': '1'}) as rep:
                 return await rep.json()
         urls = [n for n in range(0, 175)]
@@ -58,5 +59,20 @@ def testc1():
 #asyncio.run(root_movie_fetch())
 #print(asyncio.run(mov_content_fetch("https://95tv.live/api/client/v1/content/movies/Mxbj34UHg")))
 #print(asyncio.run(mov_content_fetch("https://95tv.live/api/client/v1/content/movies/Mxbj34UHg/link")))
-print(asyncio.run(mov_content_fetch("https://vod.95tv.live/public/uploads/2025/07/14/7b9dc785-c593-4671-9e92-bfa03df8fe14/Dcyge48Ng/index.m3u8?signKey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZW50SUQiOiJEY3lnZTQ4TmcifQ.jbFNpH5B2LzSfVLNMcsAdutfbs0dHiueZyFEjhVygpo", True)))
+#print(asyncio.run(mov_content_fetch("https://vod.95tv.live/public/uploads/2025/07/14/7b9dc785-c593-4671-9e92-bfa03df8fe14/Dcyge48Ng/index.m3u8?signKey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZW50SUQiOiJEY3lnZTQ4TmcifQ.jbFNpH5B2LzSfVLNMcsAdutfbs0dHiueZyFEjhVygpo", True)))
 
+pr = None
+pro = {}
+with open('proxy-list.json') as f:
+    pr = json.loads(f.read())
+
+for p in pr['data']:
+#    if not 'http' in p['protocols']:
+#        continue
+    print(f'{p["ip"]}:{p["port"]}')
+    continue
+    pro[p['protocols'][0]] = f'{p["protocols"][0]}://{p["ip"]}:{p["port"]}'
+    code = requests.get('https://example.com/', proxies=pro).status_code
+    if code == 200:
+        print(pro[p['protocols'][0]])
+    pro.clear()
