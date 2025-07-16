@@ -67,8 +67,10 @@ for rr in r3:
         thumbnail=rr['domainImage']+"/"+rr['thumbnail'],
         src=rr['domainVideo']+"/"+rr['link']
     )
-r4 = asyncio.run(content_fetch(test1['src'].replace('index.m3u8', '720/720p_000.ts'), None))
-print(r4)
+r4 = asyncio.run(content_fetch(test1['src'].replace('index.m3u8', '720/index.m3u8'), True))
+
+with open("test.m3.u8", "w") as f:
+    f.write(r4)
 
 #content = asyncio.run(mov_content_fetch("https://95tv.live/api/client/v1/content/movies/Mxbj34UHg"))
 #link = asyncio.run(mov_content_fetch("https://95tv.live/api/client/v1/content/movies/Mxbj34UHg/link"))
