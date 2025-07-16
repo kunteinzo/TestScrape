@@ -1,78 +1,76 @@
 from typing import Any
-import requests, aiohttp, json, asyncio
+from aiohttp import ClientSession
+import json, asyncio
 
-def testc(n):
-    r = requests.get(
-        f"https://95tv.live/api/client/v1/content/display/movie/items?page={n}&length=10",
-        headers={
-            "platform": "android",
-            "version": "1"
-        }
-    )
-    return r.status_code
-    mov = json.loads(r.content)
-    tem = "Name: {}\nPoster: {}\nYear: {}\nThumbnail: {}\nVote: {}\nSynopsis: {}"
-#    print(tem.format(
-#        mov['name'],
-#        mov['domainImage']+'/'+mov['poster'],
-#        mov['prodYear'],
-#        mov['domainImage']+'/'+mov['thumbnail'],
-#        mov['vote'],
-#        mov['synopsis'].strip()
-#    ))
 
-async def root_movie_fetch(outputfile: str|None = None)-> list[Any]:
-    async with aiohttp.ClientSession() as ses:
-        async def mfetch(n, sess)-> list[Any]:
-            async with sess.get(f"https://95tv.live/api/client/v1/content/display/movie/items?page={n}&length=10", headers={'platform': 'android', 'version': '1'}) as rep:
-                return await rep.json()
-        urls = [n for n in range(0, 175)]
-        tasks = [mfetch(url, ses) for url in urls]
-        results = await asyncio.gather(*tasks)
-        fin = []
-        for r in results:
-            fin += r
-        if outputfile:
-            with open(outputfile, "w") as f:
-                f.write(json.dumps(fin))
-        else:
-            print(json.dumps(fin))
-        return fin
+async def fetch_task(urls, mistext: bool = False):
+    async with ClientSession() as session:
+        async def mf(u, s, istext: bool = False, headers: dict|None = None):
+            async with s.get(u, headers=headers) as response:
+                if istext:
+                    return await response.text()
+                return await response.json()
+        return await asyncio.gather(*[mf(url, session, mistext, dict(platform="android", version="1")) for url in urls])
 
-async def mov_content_fetch(url, text: bool = False):
-    async with aiohttp.ClientSession() as ses:
+
+async def content_fetch(url, text: bool|None = False):
+    async with ClientSession() as ses:
         async with ses.get(url, headers=dict(platform='android', version='1')) as rep:
+            if text == None:
+                return await rep.read()
             if text:
                 return await rep.text()
             return await rep.json()
 
-def testc1():
-    n = 0
-    while True:
-        if testc(n) == 200:
-            print(n)
-        else:
-            break
-        n += 1
 
+root = []
+r = asyncio.run(fetch_task([f"https://95tv.live/api/client/v1/content/display/movie/items?page={u}&length=10" for u in range(0,175)]))
+for rr in r:
+    root.extend(rr)
+fin = []
+for dat in root:
+        new = dict(
+            id=dat['id'],
+            name=dat['name'],
+            is_series=dat['isSeries'],
+            is_subtitle=dat['isSubtitle'],
+            year=dat['prodYear'],
+            description=dat['synopsis'],
+            type=dat['type'],
+            rate=dat['vote'],
+            poster=dat['domainImage']+"/"+dat['poster'],
+            thumbnail=dat['domainImage']+"/"+dat['thumbnail']
+        )
+        fin.append(new)
+        break
 
-#asyncio.run(root_movie_fetch())
-#print(asyncio.run(mov_content_fetch("https://95tv.live/api/client/v1/content/movies/Mxbj34UHg")))
-#print(asyncio.run(mov_content_fetch("https://95tv.live/api/client/v1/content/movies/Mxbj34UHg/link")))
+r2 = asyncio.run(fetch_task([f"https://95tv.live/api/client/v1/content/movies/{mov['id']}" for mov in fin]))
+for rr in r2:
+    print(dict(
+        id=rr['id'],
+        duration=rr['duration'],
+        rate=rr['vote'],
+        name=rr['name'],
+        description=rr['synopsis'],
+        is_series=rr['isSeries'],
+        year=rr['prodYear'],
+        poster=rr['domainImage']+"/"+rr['poster'],
+        thumbnail=rr['domainImage']+"/"+rr['thumbnail']
+    ))
+    break
+
+r3 = asyncio.run(fetch_task([f"https://95tv.live/api/client/v1/content/movies/{u['id']}/link" for u in r2]))
+test1 = {}
+for rr in r3:
+    test1 = dict(
+        name=rr['name'],
+        thumbnail=rr['domainImage']+"/"+rr['thumbnail'],
+        src=rr['domainVideo']+"/"+rr['link']
+    )
+r4 = asyncio.run(content_fetch(test1['src'].replace('index.m3u8', '720/720p_000.ts'), None))
+print(r4)
+
+#content = asyncio.run(mov_content_fetch("https://95tv.live/api/client/v1/content/movies/Mxbj34UHg"))
+#link = asyncio.run(mov_content_fetch("https://95tv.live/api/client/v1/content/movies/Mxbj34UHg/link"))
 #print(asyncio.run(mov_content_fetch("https://vod.95tv.live/public/uploads/2025/07/14/7b9dc785-c593-4671-9e92-bfa03df8fe14/Dcyge48Ng/index.m3u8?signKey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZW50SUQiOiJEY3lnZTQ4TmcifQ.jbFNpH5B2LzSfVLNMcsAdutfbs0dHiueZyFEjhVygpo", True)))
 
-pr = None
-pro = {}
-with open('proxy-list.json') as f:
-    pr = json.loads(f.read())
-
-for p in pr['data']:
-#    if not 'http' in p['protocols']:
-#        continue
-    print(f'{p["ip"]}:{p["port"]}')
-    continue
-    pro[p['protocols'][0]] = f'{p["protocols"][0]}://{p["ip"]}:{p["port"]}'
-    code = requests.get('https://example.com/', proxies=pro).status_code
-    if code == 200:
-        print(pro[p['protocols'][0]])
-    pro.clear()
