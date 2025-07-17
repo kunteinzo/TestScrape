@@ -1,3 +1,5 @@
 
+he = None
+hr = he or {'msg': 'hi'}
 
-print("Test some stuff")
+print(hr)
