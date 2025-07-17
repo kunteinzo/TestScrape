@@ -1,5 +1,5 @@
-from typing import Any
 from aiohttp import ClientSession
+from asyncio import run, gather
 import json, asyncio
 
 
@@ -10,7 +10,7 @@ async def fetch_task(urls, mistext: bool = False):
                 if istext:
                     return await response.text()
                 return await response.json()
-        return await asyncio.gather(*[mf(url, session, mistext, dict(platform="android-mobile", version="87")) for url in urls])
+        return await gather(*[mf(url, session, mistext, dict(platform="android-mobile", version="87")) for url in urls])
 
 
 async def fetch(url, headers: dict|None = None, data: dict|None = None, isget: bool = True, text: bool|None = False):
@@ -32,7 +32,7 @@ async def fetch(url, headers: dict|None = None, data: dict|None = None, isget: b
 
 
 def refresh_token():
-    return asyncio.run(fetch(
+    return run(fetch(
         "https://api.maharprod.com/profile/v1/RefreshToken",
         headers={
             "accept-encoding": "gzip",
@@ -43,29 +43,54 @@ def refresh_token():
             "refreshToken": "AMf-vBw4ehKn9frVEAvte_UkLSjIuntAgzC-b9wMJbEkDcyiXv5HdS-0aiJRPC3BfbEmTanxhPC_dKzwlSllYGEio08xqlUpcUpstzOfmRAWia6vp4kwim6m0XSqxaTtOGOca16Dbm54sKDjnxozhv9kw-RdSvJZVkYUDRmp-2jvymU_Aq7GgNFqigQ9Unv2lR3S7Lc8CJsy"
         }),
         isget=False
-    ))
+    ))['access_token']
 
 def movie_home():
-    return json.loads(asyncio.run(
+    return json.loads(run(
         fetch(
             "https://api.maharprod.com/display/v1/moviebuilder?pageNumber=1",
             headers={
                 "accept": "application/json",
                 "content-type": "application/json",
-                "authorization": f"Bearer {refresh_token()['access_token']}"
+                "authorization": f"Bearer {refresh_token()}"
             },
             text=True
         )
     ))
 
-def mov_detail():
-    return asyncio.run(
+def mov_cat(_id: str = "00d8504d-8935-490e-962e-f4bf4a3d9eac"):
+    return run(fetch(
+        f"https://api.maharprod.com/content/v1/MovieFilter?categoryId={_id}&pageNumber=1",
+        headers={ "authorization": f"Bearer {refresh_token()}" }
+    ))
+
+def mov_detail(_id:str = "165b9620-9db9-48b9-a624-f5ad5d070d73"):
+    return run(
         fetch(
-            "https://api.maharprod.com/content/v1/MovieDetail/165b9620-9db9-48b9-a624-f5ad5d070d73",
-            headers={
-                "authorization": f"Bearer {refresh_token()['access_token']}"
-            }
+            f"https://api.maharprod.com/content/v1/MovieDetail/{_id}",
+            headers={ "authorization": f"Bearer {refresh_token()}"}
         )
     )
 
-print(mov_detail())
+def mov_stream(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88"):
+    return run(
+        fetch(
+            f"https://api.maharprod.com/revenue/url?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&source=mobile",
+            headers={ "authorization": f"Bearer {refresh_token()}"}
+        )
+    )
+# Stream
+# https://api.maharprod.com/revenue/url?type=movie&contentId=7e9dbc93-a4a9-4e7a-81f5-cd981f445e88&isPremiumUser=true&isPremiumContent=true&source=mobile
+
+def mov_down(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88"):
+    return run(
+        fetch(
+            f"https://api.maharprod.com/content/v1/download?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&fileSize=fullHd",
+            headers={ "authorization": f"Bearer {refresh_token()}"}
+        )
+    )
+
+# Download
+# https://api.maharprod.com/content/v1/download?type=movie&contentId=7e9dbc93-a4a9-4e7a-81f5-cd981f445e88&isPremiumUser=true&isPremiumContent=true&fileSize=fullHd
+
+print(mov_down())
