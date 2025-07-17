@@ -1,4 +1,4 @@
 #!/bin/bash
 
-pip install requests aiohttp asyncio beautifulsoup4 
+pip install aiohttp asyncio beautifulsoup4 
 

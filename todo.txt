@@ -1,7 +1,0 @@
-
-
-https://95tv.live/api/client/v1/content/movies/<id> 
-https://95tv.live/api/client/v1/content/movies/<id>/link
-
-
-e.g. id = Mxbj34UHg
