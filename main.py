@@ -16,7 +16,7 @@ async def fetch_task(urls, mistext: bool = False):
 async def fetch(url, headers: dict|None = None, data: dict|None = None, isget: bool = True, text: bool|None = False):
     async with ClientSession() as ses:
         if isget:
-            async with ses.get(url, headers=headers) as rep:
+            async with ses.get(url, headers=headers, data=data) as rep:
                 if text == None:
                     return await rep.read()
                 if text:
@@ -82,15 +82,31 @@ def mov_stream(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88"):
 # Stream
 # https://api.maharprod.com/revenue/url?type=movie&contentId=7e9dbc93-a4a9-4e7a-81f5-cd981f445e88&isPremiumUser=true&isPremiumContent=true&source=mobile
 
-def mov_down(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88"):
+def mov_down(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: str = "fullHd"):
     return run(
         fetch(
-            f"https://api.maharprod.com/content/v1/download?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&fileSize=fullHd",
+            f"https://api.maharprod.com/content/v1/download?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&fileSize={quality}",
             headers={ "authorization": f"Bearer {refresh_token()}"}
         )
     )
 
 # Download
 # https://api.maharprod.com/content/v1/download?type=movie&contentId=7e9dbc93-a4a9-4e7a-81f5-cd981f445e88&isPremiumUser=true&isPremiumContent=true&fileSize=fullHd
+
+
+# Series Home
+# https://api.maharprod.com/display/v1/seriesbuilder?pageNumber=1
+
+# Latest List
+# https://api.maharprod.com/display/v1/playlistDetail?id=43e33141-d488-4fe6-bae8-9a3cdfc7f972&pageNumber=1
+
+# Series Details
+# https://api.maharprod.com/content/v1/SeriesDetail/c2a856b0-e9be-401e-9f35-022274d68b08
+
+# Series Season 
+# https://api.maharprod.com/content/v1/Seasons?&filter=seriesId+eq+2f919008-d882-4389-9d98-cb212ec3407c&select=nameMm%2CnameEn%2Cid
+
+# Series Ep
+# https://api.maharprod.com/content/v1/Episodes?&filter=status+eq+true+and+seasonId+eq+6a1e7c87-2ff8-492e-8e5b-7862773e4df1&orderby=sorting+asc&top=6&skip=0
 
 print(mov_down())
