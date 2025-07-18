@@ -18,10 +18,10 @@ async def fetch_task(urls, mistext: bool = False):
 async def fetch(
         method: str,
         url: str,
+        content: str = 'json',
         token: str = "",
         headers: dict | None = None,
-        data: dict | None = None,
-        content: str = 'json'
+        data: dict | None = None
 ):
     hrs = headers or {}
     hrs['authorization'] = f"Bearer {token}"
@@ -57,40 +57,46 @@ def movie_home():
     ))
 
 
-def mov_cat(_id: str = "00d8504d-8935-490e-962e-f4bf4a3d9eac"):
-    return run(fetch("get",
-                     f"https://api.maharprod.com/content/v1/MovieFilter?categoryId={_id}&pageNumber=1",
-                     token=refresh_token()
-                     ))
-
-
-def mov_detail(_id: str = "165b9620-9db9-48b9-a624-f5ad5d070d73"):
+def movie_category(_id: str = "00d8504d-8935-490e-962e-f4bf4a3d9eac"):
     return run(
-        fetch("get",
-              f"https://api.maharprod.com/content/v1/MovieDetail/{_id}",
-              token=refresh_token()
-              )
+        fetch(
+            "get",
+            f"https://api.maharprod.com/content/v1/MovieFilter?categoryId={_id}&pageNumber=1",
+            token=refresh_token()
+        )
     )
 
 
-def mov_stream(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88"):
+def movie_detail(_id: str = "165b9620-9db9-48b9-a624-f5ad5d070d73"):
     return run(
-        fetch("get",
-              f"https://api.maharprod.com/revenue/url?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&source=mobile",
-              token=refresh_token()
-              )
+        fetch(
+            "get",
+            f"https://api.maharprod.com/content/v1/MovieDetail/{_id}",
+            token=refresh_token()
+        )
+    )
+
+
+def movie_stream(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88"):
+    return run(
+        fetch(
+            "get",
+            f"https://api.maharprod.com/revenue/url?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&source=mobile",
+            token=refresh_token()
+        )
     )
 
 
 # Stream
 # https://api.maharprod.com/revenue/url?type=movie&contentId=7e9dbc93-a4a9-4e7a-81f5-cd981f445e88&isPremiumUser=true&isPremiumContent=true&source=mobile
 
-def mov_down(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: str = "fullHd"):
+def movie_download(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: str = "fullHd"):
     return run(
-        fetch("get",
-              f"https://api.maharprod.com/content/v1/download?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&fileSize={quality}",
-              token=refresh_token()
-              )
+        fetch(
+            "get",
+            f"https://api.maharprod.com/content/v1/download?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&fileSize={quality}",
+            token=refresh_token()
+        )
     )
 
 
@@ -113,4 +119,12 @@ def mov_down(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: str = "
 # Series Ep
 # https://api.maharprod.com/content/v1/Episodes?&filter=status+eq+true+and+seasonId+eq+6a1e7c87-2ff8-492e-8e5b-7862773e4df1&orderby=sorting+asc&top=6&skip=0
 
-print(movie_home())
+with open('test.txt', 'w') as f:
+    f.write(
+        "Home:\n" +
+        json.dumps(movie_home()) + '\n\nCategory:\n' +
+        json.dumps(movie_category()) + '\n\nDetail:\n' +
+        json.dumps(movie_detail()) + '\n\nStream:\n' +
+        json.dumps(movie_stream()) + '\n\nDownload:\n' +
+        json.dumps(movie_download())
+    )
