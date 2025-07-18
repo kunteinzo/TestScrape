@@ -1,11 +1,12 @@
-from aiohttp import ClientSession
+import json
 from asyncio import run, gather
-import json, asyncio
+
+from aiohttp import ClientSession
 
 
 async def fetch_task(urls, mistext: bool = False):
     async with ClientSession() as session:
-        async def mf(u, s, istext: bool = False, headers: dict | None = None):
+        async def mf(u: str, s: ClientSession, istext: bool = False, headers: dict | None = None):
             async with s.get(u, headers=headers) as response:
                 if istext:
                     return await response.text()
@@ -14,14 +15,19 @@ async def fetch_task(urls, mistext: bool = False):
         return await gather(*[mf(url, session, mistext, dict(platform="android-mobile", version="87")) for url in urls])
 
 
-async def fetch(method: str, url, headers: dict | None = None, data: dict | None = None, text: bool | None = False):
+async def fetch(
+        method: str,
+        url: str,
+        token: str = "",
+        headers: dict | None = None,
+        data: dict | None = None,
+        content: str = 'json'
+):
+    hrs = headers or {}
+    hrs['authorization'] = f"Bearer {token}"
     async with ClientSession() as ses:
-        async with getattr(ses, method)(url, headers=headers, data=json.dumps(data)) as rep:
-            if text is None:
-                return await rep.read()
-            if text:
-                return await rep.text()
-            return await rep.json()
+        async with getattr(ses, method)(url, headers=hrs, data=json.dumps(data)) as rep:
+            return await getattr(rep, content)()
 
 
 def refresh_token():
@@ -45,12 +51,8 @@ def movie_home():
     return json.loads(run(
         fetch("get",
               "https://api.maharprod.com/display/v1/moviebuilder?pageNumber=1",
-              headers={
-                  "accept": "application/json",
-                  "content-type": "application/json",
-                  "authorization": f"Bearer {refresh_token()}"
-              },
-              text=True
+              token=refresh_token(),
+              content='text'
               )
     ))
 
@@ -58,7 +60,7 @@ def movie_home():
 def mov_cat(_id: str = "00d8504d-8935-490e-962e-f4bf4a3d9eac"):
     return run(fetch("get",
                      f"https://api.maharprod.com/content/v1/MovieFilter?categoryId={_id}&pageNumber=1",
-                     headers={"authorization": f"Bearer {refresh_token()}"}
+                     token=refresh_token()
                      ))
 
 
@@ -66,7 +68,7 @@ def mov_detail(_id: str = "165b9620-9db9-48b9-a624-f5ad5d070d73"):
     return run(
         fetch("get",
               f"https://api.maharprod.com/content/v1/MovieDetail/{_id}",
-              headers={"authorization": f"Bearer {refresh_token()}"}
+              token=refresh_token()
               )
     )
 
@@ -75,7 +77,7 @@ def mov_stream(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88"):
     return run(
         fetch("get",
               f"https://api.maharprod.com/revenue/url?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&source=mobile",
-              headers={"authorization": f"Bearer {refresh_token()}"}
+              token=refresh_token()
               )
     )
 
@@ -87,7 +89,7 @@ def mov_down(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: str = "
     return run(
         fetch("get",
               f"https://api.maharprod.com/content/v1/download?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&fileSize={quality}",
-              headers={"authorization": f"Bearer {refresh_token()}"}
+              token=refresh_token()
               )
     )
 
@@ -111,4 +113,4 @@ def mov_down(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: str = "
 # Series Ep
 # https://api.maharprod.com/content/v1/Episodes?&filter=status+eq+true+and+seasonId+eq+6a1e7c87-2ff8-492e-8e5b-7862773e4df1&orderby=sorting+asc&top=6&skip=0
 
-print(mov_down())
+print(movie_home())
