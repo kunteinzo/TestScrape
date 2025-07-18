@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, text, MetaData, Table, Column, Integer, String, select
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 
 engine = create_engine("mysql+pymysql://test:asdfgh@192.168.100.49/test")

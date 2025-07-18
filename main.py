@@ -87,9 +87,6 @@ def movie_stream(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88"):
     )
 
 
-# Stream
-# https://api.maharprod.com/revenue/url?type=movie&contentId=7e9dbc93-a4a9-4e7a-81f5-cd981f445e88&isPremiumUser=true&isPremiumContent=true&source=mobile
-
 def movie_download(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: str = "fullHd"):
     return run(
         fetch(
@@ -99,9 +96,6 @@ def movie_download(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: s
         )
     )
 
-
-# Download
-# https://api.maharprod.com/content/v1/download?type=movie&contentId=7e9dbc93-a4a9-4e7a-81f5-cd981f445e88&isPremiumUser=true&isPremiumContent=true&fileSize=fullHd
 
 
 # Series Home
