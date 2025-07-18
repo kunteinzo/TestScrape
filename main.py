@@ -17,7 +17,7 @@ async def fetch_task(urls, mistext: bool = False):
 async def content_fetch(url, text: bool | None = False):
     async with ClientSession() as ses:
         async with ses.get(url, headers=dict(platform='android', version='1')) as rep:
-            if text == None:
+            if text is None:
                 return await rep.read()
             if text:
                 return await rep.text()
