@@ -47,5 +47,3 @@ print(run(fetch(
         'authorization': f'Bearer {tk}'
     }
 )))
-
-#print(run(fetch("get", api['ser']['eps'].format("2a69ccca-1e6a-4e60-84e9-4f76d90db3ca"), "json", dict(authorization=f"Bearer {tk}"))))
