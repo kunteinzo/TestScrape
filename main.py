@@ -36,7 +36,6 @@ def refresh_token():
             "post",
             "https://api.maharprod.com/profile/v1/RefreshToken",
             headers={
-                "accept-encoding": "gzip",
                 "content-type": "application/json",
                 "authorization": "Bearer tk"
             },
