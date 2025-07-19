@@ -113,12 +113,4 @@ def movie_download(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: s
 # Series Ep
 # https://api.maharprod.com/content/v1/Episodes?&filter=status+eq+true+and+seasonId+eq+6a1e7c87-2ff8-492e-8e5b-7862773e4df1&orderby=sorting+asc&top=6&skip=0
 
-with open('test.txt', 'w') as f:
-    f.write(
-        "Home:\n" +
-        json.dumps(movie_home()) + '\n\nCategory:\n' +
-        json.dumps(movie_category()) + '\n\nDetail:\n' +
-        json.dumps(movie_detail()) + '\n\nStream:\n' +
-        json.dumps(movie_stream()) + '\n\nDownload:\n' +
-        json.dumps(movie_download())
-    )
+
