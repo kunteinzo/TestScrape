@@ -30,8 +30,8 @@ async def fetch(
     method: str, 
     url: str, 
     response_type: str,
-    headers: dict = {},
-    body: dict = {}
+    headers: dict|None = None,
+    body: dict|None = None
 ):
     async with ClientSession() as ss:
         async with getattr(ss, method)(url, headers=headers, data=json.dumps(body)) as rp:
