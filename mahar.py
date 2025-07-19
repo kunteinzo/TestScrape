@@ -23,8 +23,8 @@ class Api:
     sdet="https://api.maharprod.com/content/v1/SeriesDetail/{}"
     ssession="https://api.maharprod.com/content/v1/Seasons?&filter=seriesId+eq+{}&select=nameMm%2CnameEn%2Cid"
     seps="https://api.maharprod.com/content/v1/Episodes?&filter=status+eq+true+and+seasonId+eq+{}&orderby=sorting+asc&top=6&skip=0"
-    sstream="https://api.maharprod.com/revenue/url?type=episodes&contentId=90d3ab39-bb50-4784-ae56-90b0ce07d33e&isPremiumUser=false&isPremiumContent=true&source=mobile"
-    sdown="https://api.maharprod.com/content/v1/download?type=episodes&contentId=90d3ab39-bb50-4784-ae56-90b0ce07d33e&isPremiumUser=false&isPremiumContent=true&fileSize=fullHd"
+    sstream="https://api.maharprod.com/revenue/url?type=episodes&contentId={}&isPremiumUser=true&isPremiumContent=true&source=mobile"
+    sdown="https://api.maharprod.com/content/v1/download?type=episodes&contentId={}&isPremiumUser=true&isPremiumContent=true&fileSize=fullHd"
 
 async def fetch(
     method: str, 
@@ -37,13 +37,52 @@ async def fetch(
         async with getattr(ss, method)(url, headers=headers, data=json.dumps(body)) as rp:
             return await getattr(rp, response_type)()
 
-tk = run(fetch('post', Api().refresh, 'json', {"content-type": "application/json"},{"refreshToken": Api().rtk}))['access_token']
+api = Api()
+tk = run(fetch('post', api.refresh, 'json', {"content-type": "application/json"},{"refreshToken": Api().rtk}))['access_token']
 
-print(run(fetch(
+shome = json.loads(run(fetch(
     'get',
-    Api().shome,
+    api.shome,
     'text',
     {
         'authorization': f'Bearer {tk}'
     }
-)))
+)))['value']
+
+for series in shome:
+    playlist_id = series['playlistId']
+    ser = run(fetch(
+        'get',
+        api.plist.format(playlist_id),
+        'json',
+        dict(authorization=f"Bearer {tk}")
+    ))
+    series1 = ser['value'][0]
+    s1_id = series1['id']
+    s1_det = run(fetch(
+        'get',
+        api.sdet.format(s1_id),
+        'json',
+        dict(authorization=f"Bearer {tk}")
+    ))
+    s1_ss = run(fetch(
+        'get',
+        api.ssession.format(s1_det['value']['seriesId']),
+        'json',
+        dict(authorization=f"Bearer {tk}")
+    ))
+    s1_eps = run(fetch(
+        'get',
+        api.seps.format(s1_ss['value'][0]['id']),
+        'json',
+        dict(authorization=f"Bearer {tk}")
+    ))
+    ep_id = s1_eps['value'][0]['id']
+    stream = run(fetch(
+        'get',
+        api.sdown.format(ep_id),
+        'json',
+        dict(authorization=f"Bearer {tk}")
+    ))
+    print(stream)
+    break
