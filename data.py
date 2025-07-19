@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Float, Double
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Float, Double, text
 from sqlalchemy.orm import sessionmaker
 
 engine = create_engine("mariadb+pymysql://test:asdfgh@127.0.0.1/test")
@@ -23,3 +23,6 @@ movie = Table(
 meta.create_all(engine)
 
 Session = sessionmaker(engine)
+
+with Session() as ss:
+    print(ss.execute(text("show tables;")).all())
