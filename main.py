@@ -57,6 +57,16 @@ def movie_home():
     ))
 
 
+def movie_genres():
+    return run(
+        fetch(
+            "get",
+            "https://api.maharprod.com/content/v1/Genres?&filter=type+eq+%27movie%27and+status+eq+true&select=nameMm%2CnameEn%2Cid%2Ctype",
+            token=refresh_token()
+       )
+    )
+
+
 def movie_category(_id: str = "00d8504d-8935-490e-962e-f4bf4a3d9eac"):
     return run(
         fetch(
@@ -97,6 +107,11 @@ def movie_download(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: s
     )
 
 
+# Series Genres
+# https://api.maharprod.com/content/v1/Genres?&filter=type+eq+%27series%27and+status+eq+true&select=nameMm%2CnameEn%2Cid%2Ctype
+
+# Series Gen
+# https://api.maharprod.com/content/v1/SeriesFilter?categoryId=2d2b4532-1f16-41bd-9a91-42a29222bb2f&pageNumber=1
 
 # Series Home
 # https://api.maharprod.com/display/v1/seriesbuilder?pageNumber=1
@@ -113,4 +128,35 @@ def movie_download(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: s
 # Series Ep
 # https://api.maharprod.com/content/v1/Episodes?&filter=status+eq+true+and+seasonId+eq+6a1e7c87-2ff8-492e-8e5b-7862773e4df1&orderby=sorting+asc&top=6&skip=0
 
+# Ep download
+# https://api.maharprod.com/content/v1/download?type=episodes&contentId=90d3ab39-bb50-4784-ae56-90b0ce07d33e&isPremiumUser=false&isPremiumContent=true&fileSize=fullHd
 
+# Ep Stream
+# https://api.maharprod.com/revenue/url?type=episodes&contentId=90d3ab39-bb50-4784-ae56-90b0ce07d33e&isPremiumUser=false&isPremiumContent=true&source=mobile
+
+print(movie_genres())
+
+# Auth stuff
+# https://api.maharprod.com/sms/v1/movie/telenor/atom_sms
+# {"phoneNumber": "959***"}
+
+# https://api.maharprod.com/profile/v1/PhoneNumber/phLogin
+# {
+#  "phoneNumber": "959***",
+#  "otpno": "123456",
+#  "fcmToken": "fsr5oyChR5SSpOX9qQMO_K:APA91bFjfv4L2LcMCnKCA_94UdEKM6T3EzIbHRAgxBG7CXy68qxFSmIIyG7QNym_nOgCKQO6ujsUvRaPfmMAD_nC0Sh2gkOK7eN1VG3-hlKuoUUvxLioRmM",
+#  "deviceId": "",
+#  "deviceName": "I Phone 20 Pro Max ++",
+#  "deviceType": "superuser",
+#  "mobileCarrier": "",
+#  "os": "Linux",
+#  "osVersion": "1500",
+#  "operatorName": "Ball Ma"
+#}
+
+# https://api.maharprod.com/profile/v1/Profiles/85ecb8a3-1a40-4fff-adaf-5bebeb91b0b0?%24select=id%2Ctype%2Cemail%2CphoneNumber%2Cname%2Cnumber%2CdateOfBirth%2Cgender%2CimageUrl%2Cstatus%2Clocation%2CdisplayName
+
+
+# Mahar Live
+
+# https://api.maharprod.com/content/v1/titles?select=id,titleEn,titleMm,descriptionEn,descriptionMm,type,isPremium,resolution,rating,sorting,status&filter=type%20eq%20'channel'&expand=media(select=imageType,image),channel(select=streamingUrl)

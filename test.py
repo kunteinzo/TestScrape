@@ -1,7 +1,9 @@
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine("mysql+pymysql://test:asdfgh@192.168.100.49/test")
+from os import environ
+
+engine = create_engine(f"mysql+pymysql://{environ['DBUR']}:{environ['DBPW']}@{environ['DBHT']}/{environ['DBDB']}")
 meta = MetaData()
 
 user = Table(
