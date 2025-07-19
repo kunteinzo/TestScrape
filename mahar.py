@@ -7,6 +7,8 @@ class Api:
     rtk = "AMf-vBzr10X4GLbJpSkwiXSvUISFsrYqtPXq4TRPsvc5XQWazteZFyrLYKgpUuz9_T87VmuFazvcTiJ1CXy_6gjY28YHDcd1aqWy92QZtunauNVajWPaj025LlZsPqb6icWRmsp2UshP3MyTks0215_AEEEB53TTBvQlHTRpiMLwJMRR0n9-60s"
     refresh = "https://api.maharprod.com/profile/v1/RefreshToken"
     plist = "https://api.maharprod.com/display/v1/playlistDetail?id={}&pageNumber=1"
+    
+    # I don't know why they put return of /display/*Builder 
     mhome="https://api.maharprod.com/display/v1/moviebuilder?pageNumber=1"
     mgenres="https://api.maharprod.com/content/v1/Genres?&filter=type+eq+%27movie%27and+status+eq+true&select=nameMm%2CnameEn%2Cid%2Ctype"
     mcat="https://api.maharprod.com/content/v1/MovieFilter?categoryId={_id}&pageNumber=1"
@@ -14,7 +16,8 @@ class Api:
     mstream="https://api.maharprod.com/revenue/url?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&source=mobile"
     mdown="https://api.maharprod.com/content/v1/download?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&fileSize={quality}"
 
-    shome="https://api.maharprod.com/display/v1/seriesbuilder?pageNumber=1",
+    # I don't know why they put return of /display/*Builder 
+    shome="https://api.maharprod.com/display/v1/seriesbuilder?pageNumber=1"
     sgenres="https://api.maharprod.com/content/v1/Genres?&filter=type+eq+%27series%27and+status+eq+true&select=nameMm%2CnameEn%2Cid%2Ctype"
     scat="https://api.maharprod.com/content/v1/SeriesFilter?categoryId=2d2b4532-1f16-41bd-9a91-42a29222bb2f&pageNumber=1"
     sdet="https://api.maharprod.com/content/v1/SeriesDetail/{}"
@@ -38,7 +41,7 @@ tk = run(fetch('post', Api().refresh, 'json', {"content-type": "application/json
 
 print(run(fetch(
     'get',
-    Api().mhome,
+    Api().shome,
     'text',
     {
         'authorization': f'Bearer {tk}'
