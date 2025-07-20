@@ -26,9 +26,16 @@ async def content_fetch(url, text: bool | None = False):
 
 root = []
 r = asyncio.run(fetch_task(
-    [f"https://95tv.live/api/client/v1/content/display/movie/items?page={u}&length=10" for u in range(0, 175)]))
+        [f"https://95tv.live/api/client/v1/content/display/movie/items?page={u}&length=10" for u in range(0, 175)],
+        True
+    )
+)
 for rr in r:
-    root.extend(rr)
+    try:
+        root.extend(json.loads(rr))
+    except Exception as e:
+        print(e)
+        break
 fin = []
 for dat in root:
     new = dict(
