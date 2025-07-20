@@ -1,6 +1,17 @@
-from typing import Any
+import json
+
 from aiohttp import ClientSession
-import json, asyncio
+from asyncio import run, gather
+
+
+async def as_fetch(method: str, url: str, response_type: str, headers: dict | None = None, body: dict | None = None):
+    async with ClientSession() as session:
+        async with getattr(session, method)(url, headers=headers, data=json.dumps(body)) as response:
+            return await getattr(response, response_type)()
+
+
+def fetch(method: str, url: str, response_type: str, headers: dict | None = None, body: dict | None = None):
+    return run(as_fetch(method, url, response_type, headers, body))
 
 
 async def fetch_task(urls, mistext: bool = False):
@@ -11,19 +22,49 @@ async def fetch_task(urls, mistext: bool = False):
                     return await response.text()
                 return await response.json()
 
-        return await asyncio.gather(*[mf(url, session, mistext, dict(platform="android", version="1")) for url in urls])
+        return await gather(*[mf(url, session, mistext, dict(platform="android", version="1")) for url in urls])
 
 
-async def content_fetch(url, text: bool | None = False):
-    async with ClientSession() as ses:
-        async with ses.get(url, headers=dict(platform='android', version='1')) as rep:
-            if text is None:
-                return await rep.read()
-            if text:
-                return await rep.text()
-            return await rep.json()
+movies = fetch('get',
+               "https://95tv.live/api/client/v1/content/display/movie/items?page=0&length=10",
+               'json',
+               dict(platform='android', version='1'))
+
+movie = movies[1]
+
+movie_detail = fetch('get', f"https://95tv.live/api/client/v1/content/movies/{movie['id']}",
+                     'json',
+                     dict(platform='android', version='1'))
+
+movie_link = fetch('get', f"https://95tv.live/api/client/v1/content/movies/{movie['id']}/link",
+                   'json',
+                   dict(platform='android', version='1'))
+
+link = movie_link['domainVideo']+'/'+movie_link['link']
+
+print(link)
+
+m3u8 = fetch('get', link.replace('index.m3u8', '480/index.m3u8'), 'text', dict(platform='android', version='1'))
+
+# print(m3u8)
+
+key = fetch('post', 'https://drm.95tv.live/key/vod', 'text', dict(platform='android', version='1'))
+
+print(key)
+
+"""
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:10
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-KEY:METHOD=AES-128,URI="https://drm.95tv.live/key/vod",IV=0x00000000000000000000000000000000
+#EXTINF:10.000000,
+480p_000.ts
+"""
 
 
+"""
 root = []
 r = asyncio.run(fetch_task(
         [f"https://95tv.live/api/client/v1/content/display/movie/items?page={u}&length=10" for u in range(0, 175)],
@@ -84,3 +125,4 @@ with open("test.m3u8", "w") as f:
 # content = asyncio.run(mov_content_fetch("https://95tv.live/api/client/v1/content/movies/Mxbj34UHg"))
 # link = asyncio.run(mov_content_fetch("https://95tv.live/api/client/v1/content/movies/Mxbj34UHg/link"))
 # print(asyncio.run(mov_content_fetch("https://vod.95tv.live/public/uploads/2025/07/14/7b9dc785-c593-4671-9e92-bfa03df8fe14/Dcyge48Ng/index.m3u8?signKey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb250ZW50SUQiOiJEY3lnZTQ4TmcifQ.jbFNpH5B2LzSfVLNMcsAdutfbs0dHiueZyFEjhVygpo", True)))
+"""
