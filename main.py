@@ -28,14 +28,14 @@ async def s_fetch(
         content: str = 'json',
         token: str|None = None,
         headers: dict | None = None,
-        data: dict | None = None
+        data: dict | str | None = None
 ):
     hrs = None
     if token:
         hrs = headers or {}
         hrs['authorization'] = f"Bearer {token}"
     async with ClientSession() as ses:
-        async with getattr(ses, method)(url, headers=hrs, data=json.dumps(data)) as rep:
+        async with getattr(ses, method)(url, headers=hrs, data=data) as rep:
             return await getattr(rep, content)()
 
 
@@ -45,7 +45,7 @@ def refresh_token():
         headers={"content-type": "application/json", "authorization": "Bearer tk"},
         data={
             "refreshToken": "AMf-vBzr10X4GLbJpSkwiXSvUISFsrYqtPXq4TRPsvc5XQWazteZFyrLYKgpUuz9_T87VmuFazvcTiJ1CXy_6gjY28YHDcd1aqWy92QZtunauNVajWPaj025LlZsPqb6icWRmsp2UshP3MyTks0215_AEEEB53TTBvQlHTRpiMLwJMRR0n9-60s"}
-    ))['access_token']
+    ))
 
 
 def movie_home():
@@ -134,8 +134,6 @@ def movie_download(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: s
 
 # Ep Stream
 # https://api.maharprod.com/revenue/url?type=episodes&contentId=90d3ab39-bb50-4784-ae56-90b0ce07d33e&isPremiumUser=false&isPremiumContent=true&source=mobile
-
-print(movie_genres())
 
 # Auth stuff
 # https://api.maharprod.com/sms/v1/movie/telenor/atom_sms
