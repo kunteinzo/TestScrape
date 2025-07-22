@@ -3,86 +3,27 @@ from asyncio import run
 
 import json
 
+
 class Api:
     rtk = "AMf-vBzr10X4GLbJpSkwiXSvUISFsrYqtPXq4TRPsvc5XQWazteZFyrLYKgpUuz9_T87VmuFazvcTiJ1CXy_6gjY28YHDcd1aqWy92QZtunauNVajWPaj025LlZsPqb6icWRmsp2UshP3MyTks0215_AEEEB53TTBvQlHTRpiMLwJMRR0n9-60s"
-    refresh = "https://api.maharprod.com/profile/v1/RefreshToken"
-    plist = "https://api.maharprod.com/display/v1/playlistDetail?id={}&pageNumber=1"
-    
-    # I don't know why they put return of /display/*Builder 
-    mhome="https://api.maharprod.com/display/v1/moviebuilder?pageNumber=1"
-    mgenres="https://api.maharprod.com/content/v1/Genres?&filter=type+eq+%27movie%27and+status+eq+true&select=nameMm%2CnameEn%2Cid%2Ctype"
-    mcat="https://api.maharprod.com/content/v1/MovieFilter?categoryId={_id}&pageNumber=1"
-    mdet="https://api.maharprod.com/content/v1/MovieDetail/{_id}"
-    mstream="https://api.maharprod.com/revenue/url?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&source=mobile"
-    mdown="https://api.maharprod.com/content/v1/download?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&fileSize={quality}"
+    url_refresh = "https://api.maharprod.com/profile/v1/RefreshToken"
+    url_playlist =lambda playlist_id, page_num: f"https://api.maharprod.com/display/v1/playlistDetail?id={playlist_id}&pageNumber={page_num}"
 
     # I don't know why they put return of /display/*Builder 
-    shome="https://api.maharprod.com/display/v1/seriesbuilder?pageNumber=1"
-    sgenres="https://api.maharprod.com/content/v1/Genres?&filter=type+eq+%27series%27and+status+eq+true&select=nameMm%2CnameEn%2Cid%2Ctype"
-    scat="https://api.maharprod.com/content/v1/SeriesFilter?categoryId=2d2b4532-1f16-41bd-9a91-42a29222bb2f&pageNumber=1"
-    sdet="https://api.maharprod.com/content/v1/SeriesDetail/{}"
-    ssession="https://api.maharprod.com/content/v1/Seasons?&filter=seriesId+eq+{}&select=nameMm%2CnameEn%2Cid"
-    seps="https://api.maharprod.com/content/v1/Episodes?&filter=status+eq+true+and+seasonId+eq+{}&orderby=sorting+asc&top=6&skip=0"
-    sstream="https://api.maharprod.com/revenue/url?type=episodes&contentId={}&isPremiumUser=true&isPremiumContent=true&source=mobile"
-    sdown="https://api.maharprod.com/content/v1/download?type=episodes&contentId={}&isPremiumUser=true&isPremiumContent=true&fileSize=fullHd"
+    url_movie_home = lambda page_num:  f"https://api.maharprod.com/display/v1/moviebuilder?pageNumber={page_num}"
+    url_movie_genres = "https://api.maharprod.com/content/v1/Genres?&filter=type+eq+%27movie%27and+status+eq+true&select=nameMm%2CnameEn%2Cid%2Ctype"
+    url_movie_category = lambda category_id, page_num : f"https://api.maharprod.com/content/v1/MovieFilter?categoryId={category_id}&pageNumber={page_num}"
+    url_movie_detail = lambda movie_id: f"https://api.maharprod.com/content/v1/MovieDetail/{movie_id}"
+    url_movie_stream = lambda content_id : f"https://api.maharprod.com/revenue/url?type=movie&contentId={content_id}&isPremiumUser=true&isPremiumContent=true&source=mobile"
+    url_movie_download = lambda content_id, quality: f"https://api.maharprod.com/content/v1/download?type=movie&contentId={content_id}&isPremiumUser=true&isPremiumContent=true&fileSize={quality}"
 
-async def fetch(
-    method: str, 
-    url: str, 
-    response_type: str,
-    headers: dict|None = None,
-    body: dict|None = None
-):
-    async with ClientSession() as ss:
-        async with getattr(ss, method)(url, headers=headers, data=json.dumps(body)) as rp:
-            return await getattr(rp, response_type)()
+    # I don't know why they put return of /display/*Builder
+    url_series_home = lambda page_num: f"https://api.maharprod.com/display/v1/seriesbuilder?pageNumber={page_num}"
+    url_series_genres = "https://api.maharprod.com/content/v1/Genres?&filter=type+eq+%27series%27and+status+eq+true&select=nameMm%2CnameEn%2Cid%2Ctype"
+    url_series_category = lambda category_id, page_num: f"https://api.maharprod.com/content/v1/SeriesFilter?categoryId={category_id}&pageNumber={page_num}"
+    url_series_detail = lambda series_id: f"https://api.maharprod.com/content/v1/SeriesDetail/{series_id}"
+    url_series_season = lambda series_id: f"https://api.maharprod.com/content/v1/Seasons?&filter=seriesId+eq+{series_id}&select=nameMm%2CnameEn%2Cid"
+    url_series_episode = lambda season_id, sorting, top, skip: f"https://api.maharprod.com/content/v1/Episodes?&filter=status+eq+true+and+seasonId+eq+{season_id}&orderby=sorting+{sorting}&top={top}&skip={skip}"
+    Url_series_stream = lambda content_id : f"https://api.maharprod.com/revenue/url?type=episodes&contentId={content_id}&isPremiumUser=true&isPremiumContent=true&source=mobile"
+    url_series_download = lambda content_id, quality : f"https://api.maharprod.com/content/v1/download?type=episodes&contentId={content_id}&isPremiumUser=true&isPremiumContent=true&fileSize={quality}"
 
-api = Api()
-tk = run(fetch('post', api.refresh, 'json', {"content-type": "application/json"},{"refreshToken": Api().rtk}))['access_token']
-
-shome = json.loads(run(fetch(
-    'get',
-    api.shome,
-    'text',
-    {
-        'authorization': f'Bearer {tk}'
-    }
-)))['value']
-
-for series in shome:
-    playlist_id = series['playlistId']
-    ser = run(fetch(
-        'get',
-        api.plist.format(playlist_id),
-        'json',
-        dict(authorization=f"Bearer {tk}")
-    ))
-    series1 = ser['value'][0]
-    s1_id = series1['id']
-    s1_det = run(fetch(
-        'get',
-        api.sdet.format(s1_id),
-        'json',
-        dict(authorization=f"Bearer {tk}")
-    ))
-    s1_ss = run(fetch(
-        'get',
-        api.ssession.format(s1_det['value']['seriesId']),
-        'json',
-        dict(authorization=f"Bearer {tk}")
-    ))
-    s1_eps = run(fetch(
-        'get',
-        api.seps.format(s1_ss['value'][0]['id']),
-        'json',
-        dict(authorization=f"Bearer {tk}")
-    ))
-    ep_id = s1_eps['value'][0]['id']
-    stream = run(fetch(
-        'get',
-        api.sdown.format(ep_id),
-        'json',
-        dict(authorization=f"Bearer {tk}")
-    ))
-    print(stream)
-    break
