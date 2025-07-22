@@ -1,11 +1,22 @@
 from main import s_fetch, run, json
 from mahar import Api
+import bs4
 
 api = Api()
 
+src = bs4.BeautifulSoup(run(s_fetch('get', "https://mmhdhub.com/archives/25769", 'text')), 'html.parser')
+
+src1 = run(s_fetch('get', src.find('iframe').get('src'), 'text'))
+
+# allowDownload: ctplOptions.allowDownload,
+# allowTheatre: false,
+with open('test.html', 'w') as f:
+    f.write(src1.replace('allowDownload: ctplOptions.allowDownload,', 'allowDownload: true,').replace('allowTheatre: false,', 'allowTheatre: true,'))
+
+exit()
+
 tk = run(s_fetch('post', api.url_refresh, token='tk', headers={'content-type': 'application/json'},
                  data=json.dumps(dict(refreshToken=api.refresh_token))))['access_token']
-
 
 movie_genres = run(s_fetch('get', api.url_movie_genres, token=tk))['value']
 
