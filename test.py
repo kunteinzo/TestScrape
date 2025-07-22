@@ -28,5 +28,4 @@ movieStream = run(s_fetch('get', api.url_movie_stream(mov_contentId), token=tk))
 
 movieDownloadLink = run(s_fetch('get', api.url_movie_download(mov_contentId, 'hd'), token=tk))
 
-# Movie Genres
-# print(run(s_fetch('get', api.url_movie_genres, token=tk)))
+# todo: series stuff
