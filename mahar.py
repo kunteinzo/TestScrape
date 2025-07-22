@@ -23,6 +23,8 @@ class Api:
 	"operatorName": "Ball Ma"
 	}"""
 
+    url_live = "https://api.maharprod.com/content/v1/titles?select=id,titleEn,titleMm,descriptionEn,descriptionMm,type,isPremium,resolution,rating,sorting,status&filter=type%20eq%20'channel'&expand=media(select=imageType,image),channel(select=streamingUrl)"
+
     refresh_token = "AMf-vBwNKNmDEzv4BXB8X2s50f-TLJJG3qpf_UuhaobP8jmtm2wbj5hSf1OgE1vuPia3nV8_D2ksrJ-FyETShA6sciBh2UiOhZxFpPmFZs6SL5jsPsG5ptmVxIKopcFiuUxYXxbVN68N5JuDEqMd68HZH8UY_rtWIvofEq0y4v5eP7GEzVXil0Y"
     url_refresh = "https://api.maharprod.com/profile/v1/RefreshToken"
     url_playlist = lambda self, playlist_id, page_num: f"https://api.maharprod.com/display/v1/playlistDetail?id={playlist_id}&pageNumber={page_num}"
