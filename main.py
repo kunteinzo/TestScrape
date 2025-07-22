@@ -22,23 +22,25 @@ async def fetch_task(urls):
             *[c_fetch(url, session, headers=dict(platform="android-mobile", version="87")) for url in urls])
 
 
-async def fetch(
+async def s_fetch(
         method: str,
         url: str,
         content: str = 'json',
-        token: str = "",
+        token: str|None = None,
         headers: dict | None = None,
         data: dict | None = None
 ):
-    hrs = headers or {}
-    hrs['authorization'] = f"Bearer {token}"
+    hrs = None
+    if token:
+        hrs = headers or {}
+        hrs['authorization'] = f"Bearer {token}"
     async with ClientSession() as ses:
         async with getattr(ses, method)(url, headers=hrs, data=json.dumps(data)) as rep:
             return await getattr(rep, content)()
 
 
 def refresh_token():
-    return run(fetch(
+    return run(s_fetch(
         "post", "https://api.maharprod.com/profile/v1/RefreshToken",
         headers={"content-type": "application/json", "authorization": "Bearer tk"},
         data={
@@ -48,17 +50,17 @@ def refresh_token():
 
 def movie_home():
     return json.loads(run(
-        fetch("get",
+        s_fetch("get",
               "https://api.maharprod.com/display/v1/moviebuilder?pageNumber=1",
-              token=refresh_token(),
-              content='text'
-              )
+                token=refresh_token(),
+                content='text'
+                )
     ))
 
 
 def movie_genres():
     return run(
-        fetch(
+        s_fetch(
             "get",
             "https://api.maharprod.com/content/v1/Genres?&filter=type+eq+%27movie%27and+status+eq+true&select=nameMm%2CnameEn%2Cid%2Ctype",
             token=refresh_token()
@@ -68,7 +70,7 @@ def movie_genres():
 
 def movie_category(_id: str = "00d8504d-8935-490e-962e-f4bf4a3d9eac"):
     return run(
-        fetch(
+        s_fetch(
             "get",
             f"https://api.maharprod.com/content/v1/MovieFilter?categoryId={_id}&pageNumber=1",
             token=refresh_token()
@@ -78,7 +80,7 @@ def movie_category(_id: str = "00d8504d-8935-490e-962e-f4bf4a3d9eac"):
 
 def movie_detail(_id: str = "165b9620-9db9-48b9-a624-f5ad5d070d73"):
     return run(
-        fetch(
+        s_fetch(
             "get",
             f"https://api.maharprod.com/content/v1/MovieDetail/{_id}",
             token=refresh_token()
@@ -88,7 +90,7 @@ def movie_detail(_id: str = "165b9620-9db9-48b9-a624-f5ad5d070d73"):
 
 def movie_stream(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88"):
     return run(
-        fetch(
+        s_fetch(
             "get",
             f"https://api.maharprod.com/revenue/url?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&source=mobile",
             token=refresh_token()
@@ -98,7 +100,7 @@ def movie_stream(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88"):
 
 def movie_download(_id: str = "7e9dbc93-a4a9-4e7a-81f5-cd981f445e88", quality: str = "fullHd"):
     return run(
-        fetch(
+        s_fetch(
             "get",
             f"https://api.maharprod.com/content/v1/download?type=movie&contentId={_id}&isPremiumUser=true&isPremiumContent=true&fileSize={quality}",
             token=refresh_token()
