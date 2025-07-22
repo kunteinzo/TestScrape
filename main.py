@@ -4,15 +4,22 @@ from asyncio import run, gather
 from aiohttp import ClientSession
 
 
-async def fetch_task(urls, mistext: bool = False):
-    async with ClientSession() as session:
-        async def mf(u: str, s: ClientSession, istext: bool = False, headers: dict | None = None):
-            async with s.get(u, headers=headers) as response:
-                if istext:
-                    return await response.text()
-                return await response.json()
+async def c_fetch(
+        url: str,
+        session: ClientSession,
+        method: str = 'get',
+        response_type: str = 'json',
+        headers: dict | None = None,
+        data: dict | str | None = None
+):
+    async with getattr(session, method)(url, headers=headers, data=data) as response:
+        return await getattr(response, response_type)()
 
-        return await gather(*[mf(url, session, mistext, dict(platform="android-mobile", version="87")) for url in urls])
+
+async def fetch_task(urls):
+    async with ClientSession() as session:
+        return await gather(
+            *[c_fetch(url, session, headers=dict(platform="android-mobile", version="87")) for url in urls])
 
 
 async def fetch(
@@ -31,19 +38,12 @@ async def fetch(
 
 
 def refresh_token():
-    return run(
-        fetch(
-            "post",
-            "https://api.maharprod.com/profile/v1/RefreshToken",
-            headers={
-                "content-type": "application/json",
-                "authorization": "Bearer tk"
-            },
-            data={
-                "refreshToken": "AMf-vBzr10X4GLbJpSkwiXSvUISFsrYqtPXq4TRPsvc5XQWazteZFyrLYKgpUuz9_T87VmuFazvcTiJ1CXy_6gjY28YHDcd1aqWy92QZtunauNVajWPaj025LlZsPqb6icWRmsp2UshP3MyTks0215_AEEEB53TTBvQlHTRpiMLwJMRR0n9-60s"
-            }
-        )
-    )['access_token']
+    return run(fetch(
+        "post", "https://api.maharprod.com/profile/v1/RefreshToken",
+        headers={"content-type": "application/json", "authorization": "Bearer tk"},
+        data={
+            "refreshToken": "AMf-vBzr10X4GLbJpSkwiXSvUISFsrYqtPXq4TRPsvc5XQWazteZFyrLYKgpUuz9_T87VmuFazvcTiJ1CXy_6gjY28YHDcd1aqWy92QZtunauNVajWPaj025LlZsPqb6icWRmsp2UshP3MyTks0215_AEEEB53TTBvQlHTRpiMLwJMRR0n9-60s"}
+    ))['access_token']
 
 
 def movie_home():
@@ -62,7 +62,7 @@ def movie_genres():
             "get",
             "https://api.maharprod.com/content/v1/Genres?&filter=type+eq+%27movie%27and+status+eq+true&select=nameMm%2CnameEn%2Cid%2Ctype",
             token=refresh_token()
-       )
+        )
     )
 
 
@@ -151,7 +151,7 @@ print(movie_genres())
 #  "os": "Linux",
 #  "osVersion": "1500",
 #  "operatorName": "Ball Ma"
-#}
+# }
 
 # https://api.maharprod.com/profile/v1/Profiles/85ecb8a3-1a40-4fff-adaf-5bebeb91b0b0?%24select=id%2Ctype%2Cemail%2CphoneNumber%2Cname%2Cnumber%2CdateOfBirth%2Cgender%2CimageUrl%2Cstatus%2Clocation%2CdisplayName
 
