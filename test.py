@@ -1,17 +1,27 @@
 from main import s_fetch, run, json
 from mahar import Api
-import bs4
+import bs4, yt_dlp
 
 api = Api()
 
 src = bs4.BeautifulSoup(run(s_fetch('get', "https://mmhdhub.com/archives/25769", 'text')), 'html.parser')
 
-src1 = run(s_fetch('get', src.find('iframe').get('src'), 'text'))
+url = src.find('iframe').get('src')
 
+src1 = run(s_fetch('get', url, 'text'))
+
+with yt_dlp.YoutubeDL({}) as ydl:
+    info = ydl.extract_info(url, download=False)
+    print(json.dumps(ydl.sanitize_info(info)))
+    err = ydl.download(url)
+    print("Error" if err else "Success")
+
+exit()
 # allowDownload: ctplOptions.allowDownload,
 # allowTheatre: false,
 with open('test.html', 'w') as f:
-    f.write(src1.replace('allowDownload: ctplOptions.allowDownload,', 'allowDownload: true,').replace('allowTheatre: false,', 'allowTheatre: true,'))
+    f.write(src1.replace('allowDownload: ctplOptions.allowDownload,', 'allowDownload: true,').replace(
+        'allowTheatre: false,', 'allowTheatre: true,'))
 
 exit()
 
