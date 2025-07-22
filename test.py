@@ -6,6 +6,11 @@ api = Api()
 tk = run(s_fetch('post', api.url_refresh, token='tk', headers={'content-type': 'application/json'},
                  data=json.dumps(dict(refreshToken=api.refresh_token))))['access_token']
 
+
+movie_genres = run(s_fetch('get', api.url_movie_genres, token=tk))['value']
+
+movie_in_a_genre = run(s_fetch('get', api.url_movie_category(movie_genres[0]['id'], 1), token=tk))['value']
+
 # Movie Home
 mov_home = json.loads(run(s_fetch('get', api.url_movie_home(1), 'text', tk)))['value']
 
