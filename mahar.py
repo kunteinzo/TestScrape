@@ -7,6 +7,21 @@ import json
 class Api:
 
     url_req_code = "https://api.maharprod.com/sms/v1/movie/telenor/atom_sms"
+    # body {"phoneNumber": "959***"}
+    url_verify = "https://api.maharprod.com/profile/v1/PhoneNumber/phLogin"
+    """ body
+    {
+    "phoneNumber": "959***",
+    "otpno": "123456",
+	"fcmToken": "fsr5oyChR5SSpOX9qQMO_K:APA91bFjfv4L2LcMCnKCA_94UdEKM6T3EzIbHRAgxBG7CXy68qxFSmIIyG7QNym_nOgCKQO6ujsUvRaPfmMAD_nC0Sh2gkOK7eN1VG3-hlKuoUUvxLioRmM",
+	"deviceId": "",
+	"deviceName": "I Phone 20 Pro Max ++",
+	"deviceType": "superuser",
+	"mobileCarrier": "",
+	"os": "Linux",
+	"osVersion": "1500",
+	"operatorName": "Ball Ma"
+	}"""
 
     refresh_token = "AMf-vBwNKNmDEzv4BXB8X2s50f-TLJJG3qpf_UuhaobP8jmtm2wbj5hSf1OgE1vuPia3nV8_D2ksrJ-FyETShA6sciBh2UiOhZxFpPmFZs6SL5jsPsG5ptmVxIKopcFiuUxYXxbVN68N5JuDEqMd68HZH8UY_rtWIvofEq0y4v5eP7GEzVXil0Y"
     url_refresh = "https://api.maharprod.com/profile/v1/RefreshToken"
