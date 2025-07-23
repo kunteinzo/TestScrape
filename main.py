@@ -19,7 +19,7 @@ async def c_fetch(
 async def fetch_task(urls):
     async with ClientSession() as session:
         return await gather(
-            *[c_fetch(url, session, headers=dict(platform="android-mobile", version="87")) for url in urls])
+            *[c_fetch(url, session) for url in urls])
 
 
 async def s_fetch(
