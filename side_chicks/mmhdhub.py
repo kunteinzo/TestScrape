@@ -17,8 +17,6 @@ mp = BeautifulSoup(requests.get('https://mmhdhub.com').content, 'html.parser').f
 
 mp = int(mp[mp.rindex('/') + 1:])
 
-# for p in range(1,mp+1)
-
 rpgs = [
     [
         href.get('href')
